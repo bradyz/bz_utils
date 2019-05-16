@@ -21,11 +21,12 @@ class Dummy(object):
         if cls.video is not None:
             cls.video.release()
 
-        save_dir = save_dir or DEFAULT_DIR
+        save_dir = Path(save_dir or DEFAULT_DIR).resolve()
+        save_dir.mkdir(exist_ok=True)
         save_path = save_path or DEFAULT_PATH
 
         cls.video = None
-        cls.video_path = str(Path(save_dir).resolve().joinpath(save_path))
+        cls.video_path = str(save_dir.joinpath(save_path))
 
         cv2.destroyAllWindows()
 
