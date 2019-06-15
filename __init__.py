@@ -11,6 +11,7 @@ save_hdf5 = hdf5_maker.save_hdf5
 HDF5Dataset = hdf5_maker.HDF5Dataset
 
 show_image = video_maker.show
+
 init_video = video_maker.init
 add_to_video = video_maker.add
 
@@ -24,17 +25,7 @@ log = saver.Experiment()
 
 
 def load_json(path):
-    def _cast(x):
-        try:
-            return float(x)
-        except:
-            return str(x)
-
-
     with open(path, 'r') as f:
         data = json.load(f)
-
-    for key in data:
-        data[key] = _cast(data[key])
 
     return data

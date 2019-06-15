@@ -1,3 +1,4 @@
+import copy
 import json
 
 from pathlib import Path
@@ -53,7 +54,7 @@ class Experiment(object):
         This MUST be called.
         """
         self._log = logger
-        self.epoch = 1
+        self.epoch = 0
         self.scalars = OrderedDict()
 
         self.log_dir = Path(log_dir).resolve()
@@ -73,10 +74,19 @@ class Experiment(object):
         self.info = lambda **kwargs: self._log.info(_format(**kwargs))
 
     def save_config(self, config_dict):
+        def _process(x):
+            for key, val in x.items():
+                if isinstance(val, dict):
+                    _process(val)
+                elif not isinstance(val, float) and not isinstance(val, int):
+                    x[key] = str(val)
+
+        config = copy.deepcopy(config_dict)
+
+        _process(config)
+
         with open(str(self.log_dir / 'config.json'), 'w+') as f:
-            json.dump(
-                    {k: str(v) for k, v in config_dict.items()},
-                    f, indent=4, sort_keys=True)
+            json.dump(config, f, indent=4, sort_keys=True)
 
     def scalar(self, is_train=True, **kwargs):
         for k, v in sorted(kwargs.items()):
@@ -87,9 +97,11 @@ class Experiment(object):
 
             self.scalars[key].append(v)
 
-    def image(self, **kwargs):
+    def image(self, is_train=True, **kwargs):
+        writer = self._writer_train if is_train else self._writer_val
+
         for k, v in sorted(kwargs.items()):
-            self._writer_train.add_image(k, _preprocess_image(v), self.epoch)
+            writer.add_image(k, _preprocess_image(v), self.epoch)
 
     def end_epoch(self, net):
         for (is_train, k), v in self.scalars.items():
@@ -109,5 +121,7 @@ class Experiment(object):
 
         if self.epoch % 10 == 0:
             torch.save(net.state_dict(), str(self.log_dir / ('model_%03d.t7' % self.epoch)))
+
+        torch.save(net.state_dict(), str(self.log_dir / 'latest.t7'))
 
         self.epoch += 1
