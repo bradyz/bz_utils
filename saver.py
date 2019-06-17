@@ -103,7 +103,7 @@ class Experiment(object):
         for k, v in sorted(kwargs.items()):
             writer.add_image(k, _preprocess_image(v), self.epoch)
 
-    def end_epoch(self, net):
+    def end_epoch(self, net=None):
         for (is_train, k), v in self.scalars.items():
             info = OrderedDict()
             info['%s_%s' % ('train' if is_train else 'val', k)] = np.mean(v)
@@ -119,9 +119,10 @@ class Experiment(object):
             else:
                 self._writer_val.add_scalar(k, np.mean(v), self.epoch)
 
-        if self.epoch % 10 == 0:
-            torch.save(net.state_dict(), str(self.log_dir / ('model_%03d.t7' % self.epoch)))
+        if net is not None:
+            if self.epoch % 10 == 0:
+                torch.save(net.state_dict(), str(self.log_dir / ('model_%03d.t7' % self.epoch)))
 
-        torch.save(net.state_dict(), str(self.log_dir / 'latest.t7'))
+            torch.save(net.state_dict(), str(self.log_dir / 'latest.t7'))
 
         self.epoch += 1
