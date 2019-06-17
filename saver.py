@@ -119,6 +119,8 @@ class Experiment(object):
             else:
                 self._writer_val.add_scalar(k, np.mean(v), self.epoch)
 
+        self.scalars.clear()
+
         if net is not None:
             if self.epoch % 10 == 0:
                 torch.save(net.state_dict(), str(self.log_dir / ('model_%03d.t7' % self.epoch)))
