@@ -2,6 +2,29 @@
 Usage:
 
 python3 -m bz_utils.tuning.generate --json example.json --output_dir ~/debug --splits 1
+
+example.json:
+{
+    "setup": [
+        "echo 123",
+        "echo 456"
+    ],
+    "command": "python3 train_birdview.py",
+    "fixed": {
+        "dataset_dir": "/mnt/c/Users/Brady/Documents/code/bz_utils/tuning",
+        "log_dir": "/mnt/c/Users/Brady/Documents/code/bz_utils/logs",
+        "log_iterations": 100,
+        "max_epochs": 100,
+        "augment": 1,
+        "backbone": "resnet34",
+        "dropout": 0.5
+    },
+    "tune": {
+        "optimizer": ["sgd", "adam"],
+        "lr": [1e-4, 1e-3, 1e-2],
+        "weight_decay": [5e-5, 5e-4, 5e-3]
+    }
+}
 """
 import argparse
 import json
