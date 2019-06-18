@@ -72,7 +72,7 @@ def main(params):
         for key, val in config.items():
             line.append('--%s %s' % (key, val))
 
-        run = ' &\n    '.join(line)
+        run = ' \\\n    '.join(line)
         runs.append(run)
 
     output_dir = Path(params.output_dir)
