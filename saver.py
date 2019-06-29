@@ -18,6 +18,9 @@ def _preprocess_image(x):
     list of (h, w, 3)
     tensor of (n, h, 3)
     """
+    if isinstance(x, np.ndarray):
+        x = [x]
+
     if isinstance(x, list):
         x = np.stack(x, 0).transpose(0, 3, 1, 2)
 
